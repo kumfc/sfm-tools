@@ -3,7 +3,7 @@ import ctypes
 import traceback
 import sys
 
-debug = True
+debug = False
 
 w = QtGui.QMainWindow()
 
@@ -52,7 +52,18 @@ def mread(addr, length):
 
 
 def mwrite(addr, data, ctype):
-    log.debug('Writing ' + str(data) + ' to ' + hex(addr))
+    if debug:
+        if type(data) in (int, long):
+            ldata = hex(data)[2:-1].upper()
+            ldata = [ldata[i:i+2] for i in range(0, len(ldata), 2)]
+            ldata.reverse()
+            ldata = " ".join(ldata)
+        elif type(data) == str:
+            ldata = " ".join("{:02x}".format(ord(i)) for i in data).upper()
+        else:
+            ldata = str(data)
+        log.debug('Writing ' + ldata + ' to ' + hex(addr))
+    
     patch = ctype(data)
     bytes_to_write = ctypes.sizeof(patch)
     bytes_written = ctypes.c_size_t(0)
@@ -67,11 +78,11 @@ def patch_CStudioRender_RampFlexWeight():
 
     loc = base + 0x12e73
     log.debug('Write loc = ' + hex(loc))
-    log.debug('Data: ' + to_hex_str(mread(loc, 16)))
+    log.debug('Memory: ' + to_hex_str(mread(loc, 16)))
 
     patch = 0x90909000000078E9
     mwrite(loc, patch, ctypes.c_ulonglong)
-    log.debug('New data: ' + to_hex_str(mread(loc, 16)))
+    log.debug('Updated memory: ' + to_hex_str(mread(loc, 16)))
 
 
 def patch_ifm_limitations():
