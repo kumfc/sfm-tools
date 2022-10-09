@@ -8,6 +8,8 @@ Credits:
 - **Me** for investigating rendering limitations and making the patcher
 - @0TheSpy for investigating interface limitations
 
+Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2873014451
+
 **Important - you should run this script from embedded python interpreter!\
 Not compatible with Source 2 Filmmaker.**
 
