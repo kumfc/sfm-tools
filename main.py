@@ -91,6 +91,10 @@ def patch_ifm_limitations():
     nop, jmp = '\x90', '\xEB'
     mwrite(base + 0x263EF9, jmp, ctypes.c_char)
     mwrite(base + 0x263F09, jmp, ctypes.c_char)
+    mwrite(base + 0xBCFEC, nop, ctypes.c_char)
+    mwrite(base + 0xBCFED, nop, ctypes.c_char)
+    mwrite(base + 0xBCFF4, nop, ctypes.c_char)
+    mwrite(base + 0xBCFF5, nop, ctypes.c_char)
 
 
 def main():
