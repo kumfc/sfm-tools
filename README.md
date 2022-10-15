@@ -6,7 +6,7 @@ This script removes default flex limitations [0.0, 0.1] from Source Filmmaker an
 
 Credits: 
 - **Me** for investigating rendering limitations and making the patcher
-- @0TheSpy for investigating interface limitations and 2way flexes
+- @0TheSpy for investigating interface limitations and two-way flexes
 
 Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2873014451
 
