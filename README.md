@@ -6,7 +6,7 @@ This script removes default flex limitations [0.0, 0.1] from Source Filmmaker an
 
 Credits: 
 - **Me** for investigating rendering limitations and making the patcher
-- @0TheSpy for investigating interface limitations
+- @0TheSpy for investigating interface limitations and 2way flexes
 
 Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2873014451
 
@@ -27,7 +27,6 @@ Double-click on the flex slider and set any value you want.
 
 ## Known issues
 - Sometimes SFM stops viewport rendering few frames before fully applying new coefficients if you set exact values by double-clicking the slider. Just move a camera or something else for a second to force rendering.
-- Some standard flexes on Valve models (like JawD) won't break the limits (same behaviour in GMod).
 - Render preview differs from the viewport, but rendered file will look as you expect. 
 
 ## TODO
