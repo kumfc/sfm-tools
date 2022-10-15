@@ -11,6 +11,8 @@ read_process_memory = ctypes.windll.kernel32.ReadProcessMemory
 write_process_memory = ctypes.windll.kernel32.WriteProcessMemory
 get_current_process = ctypes.windll.kernel32.GetCurrentProcess
 
+nop, jmp = '\x90', '\xEB'
+
 
 def MessageBoxSuccess(text, window):
     msgBox = QtGui.QMessageBox(QtGui.QMessageBox.Information, "Success", text, QtGui.QMessageBox.NoButton, window)
@@ -85,10 +87,21 @@ def patch_CStudioRender_RampFlexWeight():
     log.debug('Updated memory: ' + to_hex_str(mread(loc, 16)))
 
 
-def patch_ifm_limitations():
+def patch_CStudioHdr_RunFlexRules():
+    base = ctypes.windll.ifm._handle
+
+    mwrite(base + 0x5D9C8A, nop, ctypes.c_char)
+    mwrite(base + 0x5D9C8B, nop, ctypes.c_char)
+    mwrite(base + 0x5D9C8C, nop, ctypes.c_char)
+    mwrite(base + 0x5D9CA1, nop, ctypes.c_char)
+    mwrite(base + 0x5D9CA2, nop, ctypes.c_char)
+    mwrite(base + 0x5D9CA3, nop, ctypes.c_char)
+
+
+def patch_interface_limitations():
     base = ctypes.windll.ifm._handle
     log.debug('ifm.dll base = ' + hex(base))
-    nop, jmp = '\x90', '\xEB'
+
     mwrite(base + 0x263EF9, jmp, ctypes.c_char)
     mwrite(base + 0x263F09, jmp, ctypes.c_char)
     mwrite(base + 0xBCFEC, nop, ctypes.c_char)
@@ -101,8 +114,10 @@ def main():
     try:
         log.info('Patching studiorender...')
         patch_CStudioRender_RampFlexWeight()
-        log.info('Patching ifm...')
-        patch_ifm_limitations()
+        log.info('Patching studiohdr...')
+        patch_CStudioHdr_RunFlexRules()
+        log.info('Patching interface...')
+        patch_interface_limitations()
         log.info('Success!')
         MessageBoxSuccess('Successfully patched!', w)
     except Exception as e:
