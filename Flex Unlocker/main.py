@@ -42,6 +42,7 @@ class Log():
 
 log = Log()
 
+
 def to_hex_str(s):
     return ' '.join(['%0.2X' % ord(i) for i in s])
 
@@ -71,7 +72,6 @@ def mwrite(addr, data, ctype):
     bytes_written = ctypes.c_size_t(0)
 
     write_process_memory(get_current_process(), addr, ctypes.addressof(patch), bytes_to_write, ctypes.byref(bytes_written))
-
 
 
 def patch_CStudioRender_RampFlexWeight():
