@@ -1,3 +1,5 @@
+import vs
+
 """
 sfmConsole - builtin
 sfmUtils - py
@@ -181,6 +183,7 @@ class sfm:
 
     @staticmethod
     def GetCurrentAnimationSet():
+        # type: () -> vs.movieobjects.CDmeAnimationSet
         """
         Get the currently active selected animation set.
         """
@@ -199,6 +202,7 @@ class sfm:
 
     @staticmethod
     def GetCurrentShot():
+        # type: () -> vs.movieobjects.CDmeFilmClip
         """
         Get the currently selected shot.
         """
@@ -250,7 +254,8 @@ class sfm:
         """
 
     @staticmethod
-    def Msg():
+    def Msg(string):
+        # type: (str) -> None
         """
         Redirects stdout
         """
