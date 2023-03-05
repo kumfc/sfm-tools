@@ -31,4 +31,4 @@ But if you really want to rescale every bone in the model and you have poor CPU 
 
 - In order to minimize the effect from previous issue, I simplified the expression and by that sacrificed "Remap Slider Range" functionality. Actually, with the use of master-scale you can stretch the dag up to 64 times in every direction, but if you want more, or, for some reason, negative values — use __Facial Flex Unlocker__ or simply Graph Editor mode.
 
-- Presented X Y Z is actually local bone orientation, they are not global and most commonly doesn't fit with RGB arrows. That's not a bug.
+- Presented X Y Z is actually local bone orientation, they are not global and most commonly don't fit with RGB arrows. That's not a bug.
