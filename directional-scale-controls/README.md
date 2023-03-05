@@ -10,7 +10,7 @@ Credits:
 - **Me**
 - @0TheSpy
 
-Steam Workshop: not yet \
+Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2942912893 \
 Donate: https://boosty.to/umfc
 
 **Important - you should run this script from embedded python interpreter! \
