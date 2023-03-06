@@ -86,6 +86,10 @@ def prepare_rescale_patch(get_bone_addr, get_attr, scale_x, scale_y, scale_z):
         b"\xf3\x0f\x7f\x04\x24"
         # mov    ecx,DWORD PTR [esp+0x80]
         b"\x8b\x8c\x24\x80\x00\x00\x00"
+        # cmp ecx, 00
+        b"\x83\xF9\x00"
+        # je <skip>
+        b"\x0f\x84\xc3\x00\x00\x00"
         # push   edi
         b"\x57"
         # call   DWORD PTR ds:0x12345678 // p_get_bone_addr
@@ -190,7 +194,7 @@ def apply_patches():
     base = ctypes.windll.ifm._handle
     f_get_bone_addr = base + 0x5C3580
     f_get_attr = base + 0x35DD50
-    i_patch_skip_write = base + 0x241B37
+    i_patch_skip_write = base + 0x241B2C
     i_patch_skip_read = base + 0x241411
     i_patch_rescale = base + 0x24141E
 
@@ -199,9 +203,12 @@ def apply_patches():
     sfm.scale_patch_constants += [ctypes.c_void_p(get_addr(i)) for i in sfm.scale_patch_constants[:3]]
     addr_list = [struct.pack('<I', get_addr(x)) for x in sfm.scale_patch_constants]
 
-    # movss xmm1, [addr]
-    patch_skip_write = b'\xF3\x0F\x10\x0D' + addr_list[3]
+    # fp(0)
+    patch_skip_write = b'\x8D\x3D' + addr_list[3]
     mwrite(i_patch_skip_write, patch_skip_write)
+    # movss xmm1, [addr]
+    patch_skip_write_1  = b'\xF3\x0F\x10\x0D' + addr_list[3]
+    mwrite(i_patch_skip_write + 11, patch_skip_write_1)
     # ucomiss xmm0, [addr]
     patch_skip_read = b'\x0F\x2E\x05' + addr_list[3]
     mwrite(i_patch_skip_read, patch_skip_read)
