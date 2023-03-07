@@ -367,7 +367,7 @@ def apply_patches():
     log.debug(hex(rescale_patch_jmp_offset_2))
 
     # call
-    patch_rescale_jump_2 = b'\xE8' + struct.pack('<I', rescale_patch_jmp_offset_2)
+    patch_rescale_jump_2 = b'\xE8' + struct.pack('<I', rescale_patch_jmp_offset_2) + b'\x90\x90\x90'
     mwrite(i_patch_rescale_2, patch_rescale_jump_2)
 
     log.debug('Patch applied!')
