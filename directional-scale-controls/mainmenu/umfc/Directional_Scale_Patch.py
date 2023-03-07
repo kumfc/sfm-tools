@@ -190,28 +190,143 @@ def prepare_rescale_patch(get_bone_addr, get_attr, scale_x, scale_y, scale_z):
         b"\xc3")
 
 
+def prepare_rescale_patch_2(get_attr, scale_x, scale_y, scale_z):
+    return (
+        # pushad
+        b"\x60"
+        # sub esp,10
+        b"\x83\xec\x10"
+        # movdqu [esp],xmm0
+        b"\xf3\x0f\x7f\x04\x24"
+        # push str:scale_x
+        b"\xff\x35" + scale_x +
+        # mov ecx,edi
+        b"\x8B\xCF"
+        # call dword ptr p_get_attr
+        b"\xFF\x15" + get_attr +
+        # cmp eax,00
+        b"\x83\xF8\x00"
+        # je skip
+        b"\x0F\x84\xA1\x00\x00\x00"
+        # mov eax,[eax+04]
+        b"\x8B\x40\x04"
+        # movss xmm0,[esi+08]
+        b"\xF3\x0F\x10\x46\x08"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+08],xmm0
+        b"\xF3\x0F\x11\x46\x08"
+        # movss xmm0,[esi+18]
+        b"\xF3\x0F\x10\x46\x18"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+18],xmm0
+        b"\xF3\x0F\x11\x46\x18"
+        # movss xmm0,[esi+28]
+        b"\xF3\x0F\x10\x46\x28"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+28],xmm0
+        b"\xF3\x0F\x11\x46\x28"
+        # push str:scale_y
+        b"\xFF\x35" + scale_y +
+        # mov ecx,edi
+        b"\x8B\xCF"
+        # call dword ptr p_get_attr
+        b"\xFF\x15" + get_attr +
+        # mov eax,[eax+04]
+        b"\x8B\x40\x04"
+        # movss xmm0,[esi+04]
+        b"\xF3\x0F\x10\x46\x04"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+04],xmm0
+        b"\xF3\x0F\x11\x46\x04"
+        # movss xmm0,[esi+14]
+        b"\xF3\x0F\x10\x46\x14"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+14],xmm0
+        b"\xF3\x0F\x11\x46\x14"
+        # movss xmm0,[esi+24]
+        b"\xF3\x0F\x10\x46\x24"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+24],xmm0
+        b"\xF3\x0F\x11\x46\x24"
+        # push str:scale_z
+        b"\xFF\x35" + scale_z +
+        # mov ecx,edi
+        b"\x8B\xCF"
+        # call dword ptr p_get_attr
+        b"\xFF\x15" + get_attr +
+        # mov eax,[eax+04]
+        b"\x8B\x40\x04"
+        # movss xmm0,[esi]
+        b"\xF3\x0F\x10\x06"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi],xmm0
+        b"\xF3\x0F\x11\x06"
+        # movss xmm0,[esi+10]
+        b"\xF3\x0F\x10\x46\x10"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+10],xmm0
+        b"\xF3\x0F\x11\x46\x10"
+        # movss xmm0,[esi+20]
+        b"\xF3\x0F\x10\x46\x20"
+        # mulss xmm0,[eax]
+        b"\xF3\x0F\x59\x00"
+        # movss [esi+20],xmm0
+        b"\xF3\x0F\x11\x46\x20"
+        # movdqu xmm0,[esp]
+        b"\xF3\x0F\x6F\x04\x24"
+        # add esp,10
+        b"\x83\xC4\x10"
+        # popad 
+        b"\x61"
+        # movss xmm1,[esi]
+        b"\xF3\x0F\x10\x0E"
+        # mulss xmm1,xmm0"
+        b"\xF3\x0F\x59\xC8"
+        # ret
+        b"\xc3")
+
+
 def apply_patches():
     base = ctypes.windll.ifm._handle
     f_get_bone_addr = base + 0x5C3580
     f_get_attr = base + 0x35DD50
     i_patch_skip_write = base + 0x241B2C
     i_patch_skip_read = base + 0x241411
+    i_patch_skip_read_parent_override = base + 0x4D28A9
     i_patch_rescale = base + 0x24141E
+    i_patch_rescale_2 = base + 0x4D28B6
 
     sfm.scale_patch_constants = [ctypes.c_char_p('scale_x'), ctypes.c_char_p('scale_y'), ctypes.c_char_p('scale_z'),
                                  ctypes.c_float(1337.0), ctypes.c_void_p(f_get_bone_addr), ctypes.c_void_p(f_get_attr)]
     sfm.scale_patch_constants += [ctypes.c_void_p(get_addr(i)) for i in sfm.scale_patch_constants[:3]]
     addr_list = [struct.pack('<I', get_addr(x)) for x in sfm.scale_patch_constants]
 
+    ################
+    # skip patch
+    ################
+
     # fp(0)
     patch_skip_write = b'\x8D\x3D' + addr_list[3]
     mwrite(i_patch_skip_write, patch_skip_write)
     # movss xmm1, [addr]
-    patch_skip_write_1  = b'\xF3\x0F\x10\x0D' + addr_list[3]
+    patch_skip_write_1 = b'\xF3\x0F\x10\x0D' + addr_list[3]
     mwrite(i_patch_skip_write + 11, patch_skip_write_1)
     # ucomiss xmm0, [addr]
     patch_skip_read = b'\x0F\x2E\x05' + addr_list[3]
     mwrite(i_patch_skip_read, patch_skip_read)
+    mwrite(i_patch_skip_read_parent_override, patch_skip_read)
+
+    ##########################
+    # dag rescale patch
+    ##########################
 
     rescale_patch = prepare_rescale_patch(addr_list[4], addr_list[5], addr_list[6], addr_list[7], addr_list[8])
     sfm.scale_patch_alloc = c_char_buf(len(rescale_patch)).from_buffer(bytearray(rescale_patch))
@@ -231,6 +346,29 @@ def apply_patches():
     # call
     patch_rescale_jump = b'\xE8' + struct.pack('<I', rescale_patch_jmp_offset)
     mwrite(i_patch_rescale, patch_rescale_jump)
+
+    ##############################
+    # locked & override patch
+    ##############################
+
+    rescale_patch_2 = prepare_rescale_patch_2(addr_list[5], addr_list[6], addr_list[7], addr_list[8])
+    sfm.scale_patch_alloc_2 = c_char_buf(len(rescale_patch_2)).from_buffer(bytearray(rescale_patch_2))
+    scale_patch_addr_2 = get_addr(sfm.scale_patch_alloc_2)
+
+    log.debug('Patch_2 allocated at ' + hex(scale_patch_addr_2))
+
+    old_protect = ctypes.c_long(1)
+    virtual_protect(ctypes.c_void_p(scale_patch_addr_2), ctypes.c_int(len(rescale_patch_2)), 0x40, ctypes.byref(old_protect))
+
+    rescale_patch_jmp_offset_2 = scale_patch_addr_2 - i_patch_rescale_2 - 0x5
+    if rescale_patch_jmp_offset_2 < 0:
+        rescale_patch_jmp_offset_2 += 2 ** 32
+
+    log.debug(hex(rescale_patch_jmp_offset_2))
+
+    # call
+    patch_rescale_jump_2 = b'\xE8' + struct.pack('<I', rescale_patch_jmp_offset_2)
+    mwrite(i_patch_rescale_2, patch_rescale_jump_2)
 
     log.debug('Patch applied!')
 
